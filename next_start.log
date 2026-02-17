@@ -1,10 +1,14 @@
 
-> my-app@0.1.0 start
-> next start
+> my-app@0.1.0 dev
+> next dev
 
-▲ Next.js 16.1.6
+▲ Next.js 16.1.6 (Turbopack)
 - Local:         http://localhost:3000
 - Network:       http://192.168.0.2:3000
 
 ✓ Starting...
-✓ Ready in 667ms
+✓ Ready in 1088ms
+○ Compiling /projects ...
+ GET /projects 200 in 5.4s (compile: 4.7s, render: 643ms)
+ GET /projects/apex-solutions 200 in 2.0s (compile: 1964ms, generate-params: 1008ms, render: 70ms)
+ GET /projects 200 in 60ms (compile: 4ms, render: 55ms)
