@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@payloadcms/db-sqlite": "^3.76.1",
+    "@payloadcms/live-preview-react": "^3.77.0",
     "@payloadcms/next": "^3.76.1",
     "@payloadcms/richtext-lexical": "^3.76.1",
     "next": "15.4.11",
