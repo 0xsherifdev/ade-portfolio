@@ -3,9 +3,13 @@ import pg from 'pg'
 const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URI
 
 if (!connectionString) {
-  console.log('No POSTGRES_URL found, skipping migration')
+  console.warn('⚠️  No POSTGRES_URL or DATABASE_URI found, skipping migration')
+  console.warn('⚠️  Set POSTGRES_URL in your Vercel environment variables')
   process.exit(0)
 }
+
+console.log('📦 Connecting to Postgres...')
+console.log('📦 URL prefix:', connectionString.substring(0, 30) + '...')
 
 const client = new pg.Client({ connectionString, ssl: { rejectUnauthorized: false } })
 
@@ -57,14 +61,6 @@ CREATE TABLE IF NOT EXISTS "users" (
   "lock_until" timestamp(3) with time zone
 );
 CREATE UNIQUE INDEX IF NOT EXISTS "users_email_idx" ON "users" ("email");
-
-CREATE TABLE IF NOT EXISTS "users_sessions" (
-  "id" serial PRIMARY KEY,
-  "_order" integer NOT NULL,
-  "_parent_id" integer NOT NULL REFERENCES "users" ON DELETE CASCADE,
-  "created_at" timestamp(3) with time zone,
-  "expires_at" timestamp(3) with time zone
-);
 
 -- Media
 CREATE TABLE IF NOT EXISTS "media" (
@@ -221,12 +217,11 @@ CREATE TABLE IF NOT EXISTS "site_settings_nav_items" (
   "link" varchar
 );
 
--- Insert initial home row if empty
+-- Seed initial rows for globals
 INSERT INTO "home" ("id", "updated_at", "created_at")
 SELECT 1, now(), now()
 WHERE NOT EXISTS (SELECT 1 FROM "home" LIMIT 1);
 
--- Insert initial site_settings row if empty
 INSERT INTO "site_settings" ("id", "updated_at", "created_at")
 SELECT 1, now(), now()
 WHERE NOT EXISTS (SELECT 1 FROM "site_settings" LIMIT 1);
@@ -235,14 +230,19 @@ WHERE NOT EXISTS (SELECT 1 FROM "site_settings" LIMIT 1);
 async function run() {
   try {
     await client.connect()
-    console.log('Connected to Postgres, running migrations...')
+    console.log('✅ Connected to Postgres, running migrations...')
     await client.query(sql)
-    console.log('Migration complete!')
+    console.log('✅ Migration complete! All tables created.')
+    
+    // Verify
+    const res = await client.query("SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename")
+    console.log('📋 Tables:', res.rows.map(r => r.tablename).join(', '))
+    
     await client.end()
   } catch (err) {
-    console.error('Migration failed:', err.message)
-    // Don't exit with error - let the build continue with fallback
+    console.error('❌ Migration failed:', err.message)
     try { await client.end() } catch {}
+    // Don't exit with error code so build continues
   }
 }
 

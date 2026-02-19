@@ -10,43 +10,46 @@ import Contact from "@/components/Contact"
 
 export const dynamic = 'force-dynamic'
 
-export default async function Home() {
-  const serverURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-
+async function getHomeData() {
   try {
     const payload = await getPayload({ config: configPromise })
-
-    const home = await payload.findGlobal({
-      slug: 'home',
-      depth: 2,
-    })
-
+    const home = await payload.findGlobal({ slug: 'home', depth: 2 })
     const projectsData = await payload.find({
       collection: 'projects',
       where: { featured: { equals: true } },
       limit: 20,
       depth: 2,
     })
+    return { home, projects: projectsData.docs }
+  } catch (error) {
+    console.error('Failed to fetch from Payload CMS:', error)
+    return null
+  }
+}
 
+export default async function Home() {
+  const serverURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const data = await getHomeData()
+
+  if (data) {
     return (
       <LivePreviewHome
-        initialHome={home}
-        initialProjects={projectsData.docs}
+        initialHome={data.home}
+        initialProjects={data.projects}
         serverURL={serverURL}
       />
     )
-  } catch (error) {
-    console.error('Failed to fetch from Payload CMS, rendering fallback:', error)
-    return (
-      <ScrollRevealWrapper>
-        <main>
-          <Hero />
-          <About />
-          <Skills />
-          <Projects />
-          <Contact />
-        </main>
-      </ScrollRevealWrapper>
-    )
   }
+
+  return (
+    <ScrollRevealWrapper>
+      <main>
+        <Hero />
+        <About />
+        <Skills />
+        <Projects />
+        <Contact />
+      </main>
+    </ScrollRevealWrapper>
+  )
 }
