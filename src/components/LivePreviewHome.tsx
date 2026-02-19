@@ -17,7 +17,7 @@ type Props = {
 export default function LivePreviewHome({ initialHome, initialProjects, serverURL }: Props) {
   useScrollReveal()
 
-  const { data: home } = useLivePreview({
+  const { data: home } = useLivePreview<any>({
     initialData: initialHome,
     serverURL,
     depth: 2,
