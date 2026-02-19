@@ -1,18 +1,86 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { projects } from '@/data/projects';
+import { projects as hardcodedProjects } from '@/data/projects';
 
-const Projects = () => {
+interface Technology {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface Media {
+  id: string;
+  url: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+}
+
+interface CMSProject {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle?: string | null;
+  description: string;
+  tech?: (string | Technology)[] | null;
+  links?: {
+    code?: string | null;
+    demo?: string | null;
+  } | null;
+  image: string | Media;
+  icon?: string | null;
+  featured?: boolean | null;
+}
+
+interface ProjectsProps {
+  data?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  projects?: CMSProject[];
+}
+
+const Projects = ({ data, projects: cmsProjects }: ProjectsProps) => {
+  const title = data?.title || 'Featured Projects';
+
+  // Use CMS projects if available, otherwise fall back to hardcoded
+  const hasCMSProjects = cmsProjects && cmsProjects.length > 0;
+
+  const projectItems = hasCMSProjects
+    ? cmsProjects.map((p) => ({
+        id: p.id,
+        slug: p.slug,
+        title: p.title,
+        description: p.description,
+        tech: (p.tech || []).map((t) => (typeof t === 'string' ? t : (t as Technology).name)),
+        links: {
+          code: p.links?.code || undefined,
+          demo: p.links?.demo || undefined,
+        },
+        image: typeof p.image === 'string' ? p.image : (p.image as Media).url,
+        imageAlt: typeof p.image === 'string' ? p.title : ((p.image as Media).alt || p.title),
+      }))
+    : hardcodedProjects.map((p) => ({
+        id: p.id,
+        slug: p.slug,
+        title: p.title,
+        description: p.description,
+        tech: p.tech,
+        links: p.links,
+        image: p.image,
+        imageAlt: p.title,
+      }));
+
   return (
     <section id="projects" className="py-32 px-4 md:px-12 max-w-[1400px] mx-auto reveal">
       <div className="flex items-center gap-6 mb-16">
         <span className="font-mono text-accent">03</span>
-        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Featured Projects</h2>
+        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{title}</h2>
         <div className="flex-1 h-px bg-border max-w-[300px]"></div>
       </div>
 
       <div className="grid gap-16">
-        {projects.map((project, index) => (
+        {projectItems.map((project, index) => (
           <div key={project.id} className={`grid md:grid-cols-2 gap-12 p-12 bg-bg-card border border-border hover:border-accent transition-all duration-300 ${index % 2 !== 0 ? 'md:[direction:rtl]' : ''}`}>
             <div className={`flex flex-col justify-center ${index % 2 !== 0 ? 'md:[direction:ltr]' : ''}`}>
               <div className="font-mono text-xs text-accent mb-4">{'//'} Featured Project</div>
@@ -59,7 +127,7 @@ const Projects = () => {
             <Link href={`/projects/${project.slug}`} className={`aspect-[16/10] block overflow-hidden relative rounded-lg border border-border bg-bg-secondary group ${index % 2 !== 0 ? 'md:[direction:ltr]' : ''}`}>
                 <Image
                   src={project.image}
-                  alt={project.title}
+                  alt={project.imageAlt}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
