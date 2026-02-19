@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node src/migrate.mjs && next build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -15,6 +15,7 @@
     "@payloadcms/richtext-lexical": "^3.76.1",
     "next": "15.4.11",
     "payload": "^3.76.1",
+    "pg": "^8.18.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "sharp": "^0.34.5"
