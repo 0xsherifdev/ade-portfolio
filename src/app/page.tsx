@@ -2,6 +2,9 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import LivePreviewHome from "@/components/LivePreviewHome"
 
+// This page is CMS-driven — always render server-side with live DB data.
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
   const payload = await getPayload({ config: configPromise })
 

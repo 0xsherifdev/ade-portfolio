@@ -28,21 +28,18 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build-time args — PAYLOAD_SECRET and NEXT_PUBLIC_SITE_URL are read
-# by the Payload config during the build step.
-# NEXT_PUBLIC_SITE_URL is compiled into the client bundle, so it must
-# match the final production URL. Override via --build-arg at build time.
-ARG PAYLOAD_SECRET=build-placeholder-do-not-use
+# NEXT_PUBLIC_SITE_URL is compiled into the client bundle — pass your real
+# domain via --build-arg NEXT_PUBLIC_SITE_URL=https://yourdomain.com
 ARG NEXT_PUBLIC_SITE_URL=http://localhost:3000
-ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 
-# Point Payload at a throw-away SQLite file during the build phase.
-# The real DB lives in the mounted volume at runtime.
+# PAYLOAD_SECRET is runtime-only — never needed during next build.
+# The payload.config.ts fallback ('YOUR_SECRET_HERE') is used here safely.
+# Point Payload at a throw-away file; the real DB lives in the runtime volume.
 ENV DATABASE_URI=file:/tmp/build-placeholder.db
 
-# Run only next build here; payload migrate runs at container startup
-# against the real persisted database (see entrypoint.sh).
+# The root page uses `force-dynamic` so Next.js will NOT attempt to
+# statically prerender it (which would require a live DB connection).
 RUN npx next build
 
 
