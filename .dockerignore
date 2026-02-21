@@ -1,0 +1,51 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies (installed fresh in each stage)
+node_modules
+
+# Next.js build output (built inside Docker)
+.next
+out
+
+# Local database — must never ship in the image
+payload.db
+payload.db-shm
+payload.db-wal
+*.db
+*.db-*
+
+# Environment files — secrets must never ship in the image
+.env
+.env.*
+!.env.example
+
+# Editor / OS artefacts
+.DS_Store
+.idea
+.vscode
+*.pem
+
+# Logs
+*.log
+npm-debug.log*
+
+# CI / CD
+.github
+.circleci
+
+# Docker files themselves (avoid recursive copy)
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Docs / miscellaneous
+DEPLOYMENT.md
+MIGRATION_SUMMARY.md
+README.md
+verification.log
+next_start.log
+
+# Claude workspace
+.claude
