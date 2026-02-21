@@ -4,12 +4,12 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import sharp from 'sharp'
 
-import { Users } from './payload/collections/Users'
-import { Media } from './payload/collections/Media'
-import { Projects } from './payload/collections/Projects'
-import { Technologies } from './payload/collections/Technologies'
-import { Home } from './payload/globals/Home'
-import { SiteSettings } from './payload/globals/SiteSettings'
+import { Users } from './payload/collections/Users.ts'
+import { Media } from './payload/collections/Media.ts'
+import { Projects } from './payload/collections/Projects.ts'
+import { Technologies } from './payload/collections/Technologies.ts'
+import { Home } from './payload/globals/Home.ts'
+import { SiteSettings } from './payload/globals/SiteSettings.ts'
 
 export default buildConfig({
   admin: {
@@ -49,10 +49,6 @@ export default buildConfig({
     client: {
       url: process.env.DATABASE_URI || 'file:./payload.db',
     },
-    // Push schema changes automatically on startup — avoids running
-    // `payload migrate` as a separate process (which has tsx ESM
-    // resolution issues in Alpine containers).
-    push: true,
   }),
   sharp,
 })
