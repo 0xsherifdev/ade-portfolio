@@ -49,6 +49,10 @@ export default buildConfig({
     client: {
       url: process.env.DATABASE_URI || 'file:./payload.db',
     },
+    // Push schema changes automatically on startup — avoids running
+    // `payload migrate` as a separate process (which has tsx ESM
+    // resolution issues in Alpine containers).
+    push: true,
   }),
   sharp,
 })
