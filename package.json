@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node --import tsx/esm node_modules/payload/dist/bin/index.js generate:importmap && next build",
     "start": "next start",
     "lint": "eslint"
   },
