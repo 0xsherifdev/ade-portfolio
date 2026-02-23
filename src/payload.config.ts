@@ -42,13 +42,12 @@ export default buildConfig({
     SiteSettings,
   ],
   plugins: [
-    vercelBlobStorage({
-      enabled: process.env.VERCEL === '1',
+    ...(process.env.VERCEL === '1' ? [vercelBlobStorage({
       token: process.env.BLOB_READ_WRITE_TOKEN || '',
       collections: {
         media: true,
       },
-    }),
+    })] : []),
   ],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || 'YOUR_SECRET_HERE',
