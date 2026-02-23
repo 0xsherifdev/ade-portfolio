@@ -1,4 +1,13 @@
 services:
+  mongo:
+    image: mongo:7
+    container_name: ade-portfolio-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: ade-portfolio
+    volumes:
+      - mongo_data:/data/db
+
   app:
     build:
       context: .
@@ -7,22 +16,19 @@ services:
         # NEXT_PUBLIC_SITE_URL is baked into the client bundle at build time —
         # set this to your actual production domain before building.
         NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
-        # PAYLOAD_SECRET is also read during build; override via .env
-        PAYLOAD_SECRET: ${PAYLOAD_SECRET}
-    image: ade-portfolio:latest
     container_name: ade-portfolio
     restart: unless-stopped
+    depends_on:
+      - mongo
     ports:
       - "${PORT:-3000}:3000"
     environment:
       NODE_ENV: production
       PAYLOAD_SECRET: ${PAYLOAD_SECRET}
-      DATABASE_URI: file:/data/payload.db
+      DATABASE_URI: ${DATABASE_URI:-mongodb://mongo:27017/ade-portfolio}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
       PORT: ${PORT:-3000}
     volumes:
-      # Persist the SQLite database across container restarts/upgrades
-      - payload_data:/data
       # Persist uploaded media files
       - payload_media:/app/public/media
     healthcheck:
@@ -33,7 +39,7 @@ services:
       start_period: 90s
 
 volumes:
-  payload_data:
+  mongo_data:
     driver: local
   payload_media:
     driver: local

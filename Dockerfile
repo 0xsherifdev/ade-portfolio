@@ -5,7 +5,7 @@ FROM node:20-alpine AS deps
 
 WORKDIR /app
 
-# libc6-compat for native binaries (sharp, libsql)
+# libc6-compat for native binaries (sharp)
 RUN apk add --no-cache libc6-compat
 
 COPY package.json package-lock.json ./
@@ -35,8 +35,8 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 
 # PAYLOAD_SECRET is runtime-only — never needed during next build.
 # The payload.config.ts fallback ('YOUR_SECRET_HERE') is used here safely.
-# Point Payload at a throw-away file; the real DB lives in the runtime volume.
-ENV DATABASE_URI=file:/tmp/build-placeholder.db
+# All CMS routes are force-dynamic, so no actual DB connection is made during build.
+ENV DATABASE_URI=mongodb://localhost/build-placeholder
 
 # The root page uses `force-dynamic` so Next.js will NOT attempt to
 # statically prerender it (which would require a live DB connection).
@@ -58,9 +58,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Create a non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
     adduser  --system --uid 1001 nextjs
-
-# Persistent volume mount-point for the SQLite database
-RUN mkdir -p /data && chown nextjs:nodejs /data
 
 # Install production-only dependencies
 COPY package.json package-lock.json ./
