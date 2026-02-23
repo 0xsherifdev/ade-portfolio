@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import { RichText } from '@payloadcms/richtext-lexical/react';
+import { motion, type Variants } from 'framer-motion';
 
 interface HeroProps {
   data?: {
@@ -14,6 +17,20 @@ interface HeroProps {
   };
 }
 
+const container: Variants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const item: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
+};
+
 const Hero = ({ data }: HeroProps) => {
   const topText = data?.topText || 'Web3 Developer';
   const subheadline = data?.subheadline || "I'm Ade — a full-stack blockchain developer specializing in smart contracts, DeFi protocols, and AI-powered Web3 applications. Turning ideas into production-ready code.";
@@ -26,23 +43,23 @@ const Hero = ({ data }: HeroProps) => {
 
   return (
     <section className="min-h-screen flex flex-col justify-center px-4 md:px-12 max-w-[1400px] mx-auto pt-20 relative">
-      <div className="animate-fade-up">
-        <div className="font-mono text-sm text-accent mb-6 flex items-center gap-3 before:content-[''] before:w-10 before:h-px before:bg-accent">
+      <motion.div variants={container} initial="hidden" animate="show">
+        <motion.div variants={item} className="font-mono text-sm text-accent mb-6 flex items-center gap-3 before:content-[''] before:w-10 before:h-px before:bg-accent">
           {topText}
-        </div>
+        </motion.div>
         {data?.headline ? (
-          <div className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.1] mb-6 tracking-tighter [&_em]:text-accent [&_em]:relative [&_em]:not-italic">
+          <motion.div variants={item} className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.1] mb-6 tracking-tighter [&_em]:text-accent [&_em]:relative [&_em]:not-italic">
             <RichText data={data.headline} />
-          </div>
+          </motion.div>
         ) : (
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.1] mb-6 tracking-tighter">
+          <motion.h1 variants={item} className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.1] mb-6 tracking-tighter">
             Building the <span className="text-accent relative">decentralized</span> future
-          </h1>
+          </motion.h1>
         )}
-        <p className="text-xl md:text-2xl text-text-secondary max-w-2xl mb-10 font-light">
+        <motion.p variants={item} className="text-xl md:text-2xl text-text-secondary max-w-2xl mb-10 font-light">
           {subheadline}
-        </p>
-        <div className="flex flex-col sm:flex-row gap-6">
+        </motion.p>
+        <motion.div variants={item} className="flex flex-col sm:flex-row gap-6">
           {buttons.map((button, index) => (
             <Link
               key={index}
@@ -56,12 +73,17 @@ const Hero = ({ data }: HeroProps) => {
               {button.label || (button.style === 'primary' ? 'View Projects →' : 'Get in Touch')}
             </Link>
           ))}
-        </div>
-      </div>
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce hidden md:flex">
+        </motion.div>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.8 }}
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce hidden md:flex"
+      >
         <span className="font-mono text-xs text-text-muted rotate-180 [writing-mode:vertical-rl]">scroll</span>
         <div className="w-px h-10 bg-gradient-to-b from-accent to-transparent"></div>
-      </div>
+      </motion.div>
     </section>
   );
 };

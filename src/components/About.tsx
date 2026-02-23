@@ -1,4 +1,7 @@
+'use client';
+
 import { RichText } from '@payloadcms/richtext-lexical/react';
+import { motion, type Variants } from 'framer-motion';
 
 interface AboutProps {
   data?: {
@@ -10,6 +13,20 @@ interface AboutProps {
     }> | null;
   };
 }
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 40 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
+};
+
+const staggerContainer: Variants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 
 const About = ({ data }: AboutProps) => {
   const title = data?.title || 'About';
@@ -23,15 +40,28 @@ const About = ({ data }: AboutProps) => {
   const stats = data?.stats?.length ? data.stats : defaultStats;
 
   return (
-    <section id="about" className="py-32 px-4 md:px-12 max-w-[1400px] mx-auto reveal">
-      <div className="flex items-center gap-6 mb-16">
+    <section id="about" className="py-32 px-4 md:px-12 max-w-[1400px] mx-auto">
+      <motion.div
+        className="flex items-center gap-6 mb-16"
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-100px" }}
+      >
         <span className="font-mono text-accent">01</span>
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{title}</h2>
         <div className="flex-1 h-px bg-border max-w-[300px]"></div>
-      </div>
+      </motion.div>
 
       <div className="grid md:grid-cols-2 gap-16 items-start">
-        <div className="text-lg md:text-xl text-text-secondary space-y-6 [&_strong]:text-text-primary">
+        <motion.div
+          className="text-lg md:text-xl text-text-secondary space-y-6 [&_strong]:text-text-primary"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ delay: 0.1 }}
+        >
           {data?.content ? (
             <RichText data={data.content} />
           ) : (
@@ -47,16 +77,26 @@ const About = ({ data }: AboutProps) => {
               </p>
             </>
           )}
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-2 gap-8">
+        <motion.div
+          className="grid grid-cols-2 gap-8"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-100px" }}
+        >
           {stats.map((stat, index) => (
-            <div key={index} className="p-8 bg-bg-card border border-border hover:border-accent hover:-translate-y-1 transition-all duration-300">
+            <motion.div
+              key={index}
+              variants={fadeUp}
+              className="p-8 bg-bg-card border border-border hover:border-accent hover:-translate-y-1 transition-all duration-300"
+            >
               <div className="font-mono text-4xl font-bold text-accent mb-2">{stat.number}</div>
               <div className="text-sm text-text-secondary">{stat.label}</div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

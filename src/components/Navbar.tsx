@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,7 +27,12 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 py-6 px-4 md:px-12 flex justify-between items-center z-50 bg-gradient-to-b from-bg-primary to-transparent">
+    <motion.nav
+      className="fixed top-0 left-0 right-0 py-6 px-4 md:px-12 flex justify-between items-center z-50 bg-gradient-to-b from-bg-primary to-transparent"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+    >
       <Link href="/" className="font-mono text-xl font-semibold text-accent tracking-tighter hover:text-white transition-colors">
         ade.dev
       </Link>
@@ -68,7 +74,7 @@ const Navbar = () => {
           </Link>
         ))}
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

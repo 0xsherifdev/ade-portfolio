@@ -1,3 +1,7 @@
+'use client';
+
+import { motion, type Variants } from 'framer-motion';
+
 interface Technology {
   id: string;
   name: string;
@@ -15,6 +19,20 @@ interface SkillsProps {
   };
 }
 
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 40 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
+};
+
+const staggerContainer: Variants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+};
+
 const Skills = ({ data }: SkillsProps) => {
   const title = data?.title || 'Tech Stack';
 
@@ -27,21 +45,37 @@ const Skills = ({ data }: SkillsProps) => {
   const categories = data?.categories?.length ? data.categories : defaultSkills;
 
   return (
-    <section id="skills" className="py-32 px-4 md:px-12 max-w-[1400px] mx-auto reveal">
-      <div className="flex items-center gap-6 mb-16">
+    <section id="skills" className="py-32 px-4 md:px-12 max-w-[1400px] mx-auto">
+      <motion.div
+        className="flex items-center gap-6 mb-16"
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-100px" }}
+      >
         <span className="font-mono text-accent">02</span>
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{title}</h2>
         <div className="flex-1 h-px bg-border max-w-[300px]"></div>
-      </div>
+      </motion.div>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <motion.div
+        className="grid md:grid-cols-3 gap-6"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-100px" }}
+      >
         {categories.map((skillGroup, index) => {
           const itemNames = (skillGroup.items || []).map((item) =>
             typeof item === 'string' ? item : (item as Technology).name
           );
 
           return (
-            <div key={index} className="p-10 bg-gradient-to-br from-bg-card to-bg-secondary border border-border rounded-xl relative overflow-hidden hover:border-accent hover:-translate-y-1 transition-all duration-300 group">
+            <motion.div
+              key={index}
+              variants={fadeUp}
+              className="p-10 bg-gradient-to-br from-bg-card to-bg-secondary border border-border rounded-xl relative overflow-hidden hover:border-accent hover:-translate-y-1 transition-all duration-300 group"
+            >
               <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <h3 className="font-mono text-base text-accent mb-7 flex items-center gap-2 tracking-wide before:content-['//'] before:text-text-muted">
                 {skillGroup.category}
@@ -53,10 +87,10 @@ const Skills = ({ data }: SkillsProps) => {
                   </span>
                 ))}
               </div>
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </section>
   );
 };

@@ -6,8 +6,6 @@ import About from "@/components/About"
 import Skills from "@/components/Skills"
 import Projects from "@/components/Projects"
 import Contact from "@/components/Contact"
-import useScrollReveal from "@/hooks/useScrollReveal"
-
 type Props = {
   initialHome: any
   initialProjects: any[]
@@ -15,7 +13,6 @@ type Props = {
 }
 
 export default function LivePreviewHome({ initialHome, initialProjects, serverURL }: Props) {
-  useScrollReveal()
 
   const { data: home } = useLivePreview<any>({
     initialData: initialHome,

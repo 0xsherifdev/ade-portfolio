@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { motion, type Variants } from 'framer-motion';
 
 interface ContactProps {
   data?: {
@@ -20,6 +23,20 @@ const socialIcons: Record<string, React.ReactNode> = {
   linkedin: <><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></>,
 };
 
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 40 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
+};
+
+const staggerContainer: Variants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+};
+
 const Contact = ({ data }: ContactProps) => {
   const title = data?.title || 'Contact';
   const heading = data?.heading || "Let's build something together";
@@ -34,22 +51,36 @@ const Contact = ({ data }: ContactProps) => {
   const socialLinks = data?.socialLinks?.length ? data.socialLinks : defaultSocials;
 
   return (
-    <section id="contact" className="py-32 px-4 md:px-12 max-w-[1400px] mx-auto reveal">
-      <div className="flex items-center gap-6 mb-16">
+    <section id="contact" className="py-32 px-4 md:px-12 max-w-[1400px] mx-auto">
+      <motion.div
+        className="flex items-center gap-6 mb-16"
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-100px" }}
+      >
         <span className="font-mono text-accent">04</span>
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{title}</h2>
         <div className="flex-1 h-px bg-border max-w-[300px]"></div>
-      </div>
+      </motion.div>
 
-      <div className="text-center max-w-[700px] mx-auto">
-        <h3 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">{heading}</h3>
-        <p className="text-xl text-text-secondary mb-12 font-light">
+      <motion.div
+        className="text-center max-w-[700px] mx-auto"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-100px" }}
+      >
+        <motion.h3 variants={fadeUp} className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">{heading}</motion.h3>
+        <motion.p variants={fadeUp} className="text-xl text-text-secondary mb-12 font-light">
           {content}
-        </p>
-        <Link href={`mailto:${email}`} className="font-mono text-lg text-accent inline-block px-8 py-4 border border-border mb-12 hover:border-accent hover:bg-accent-dim transition-all duration-300">
-          {email}
-        </Link>
-        <div className="flex justify-center gap-8">
+        </motion.p>
+        <motion.div variants={fadeUp}>
+          <Link href={`mailto:${email}`} className="font-mono text-lg text-accent inline-block px-8 py-4 border border-border mb-12 hover:border-accent hover:bg-accent-dim transition-all duration-300">
+            {email}
+          </Link>
+        </motion.div>
+        <motion.div variants={fadeUp} className="flex justify-center gap-8">
           {socialLinks.map((social, index) => {
             const platformKey = (social.platform || '').toLowerCase();
             const icon = socialIcons[platformKey];
@@ -64,8 +95,8 @@ const Contact = ({ data }: ContactProps) => {
               </Link>
             );
           })}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 };

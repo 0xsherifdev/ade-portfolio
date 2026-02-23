@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { motion, type Variants } from 'framer-motion';
 import { projects as hardcodedProjects } from '@/data/projects';
 
 interface Technology {
@@ -40,10 +43,14 @@ interface ProjectsProps {
   projects?: CMSProject[];
 }
 
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 50 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
+};
+
 const Projects = ({ data, projects: cmsProjects }: ProjectsProps) => {
   const title = data?.title || 'Featured Projects';
 
-  // Use CMS projects if available, otherwise fall back to hardcoded
   const hasCMSProjects = cmsProjects && cmsProjects.length > 0;
 
   const projectItems = hasCMSProjects
@@ -72,16 +79,29 @@ const Projects = ({ data, projects: cmsProjects }: ProjectsProps) => {
       }));
 
   return (
-    <section id="projects" className="py-32 px-4 md:px-12 max-w-[1400px] mx-auto reveal">
-      <div className="flex items-center gap-6 mb-16">
+    <section id="projects" className="py-32 px-4 md:px-12 max-w-[1400px] mx-auto">
+      <motion.div
+        className="flex items-center gap-6 mb-16"
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-100px" }}
+      >
         <span className="font-mono text-accent">03</span>
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{title}</h2>
         <div className="flex-1 h-px bg-border max-w-[300px]"></div>
-      </div>
+      </motion.div>
 
       <div className="grid gap-16">
         {projectItems.map((project, index) => (
-          <div key={project.id} className={`grid md:grid-cols-2 gap-12 p-12 bg-bg-card border border-border hover:border-accent transition-all duration-300 ${index % 2 !== 0 ? 'md:[direction:rtl]' : ''}`}>
+          <motion.div
+            key={project.id}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-80px" }}
+            className={`grid md:grid-cols-2 gap-12 p-12 bg-bg-card border border-border hover:border-accent transition-all duration-300 ${index % 2 !== 0 ? 'md:[direction:rtl]' : ''}`}
+          >
             <div className={`flex flex-col justify-center ${index % 2 !== 0 ? 'md:[direction:ltr]' : ''}`}>
               <div className="font-mono text-xs text-accent mb-4">{'//'} Featured Project</div>
               <Link href={`/projects/${project.slug}`} className="hover:text-accent transition-colors w-fit">
@@ -133,18 +153,24 @@ const Projects = ({ data, projects: cmsProjects }: ProjectsProps) => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-br from-accent-dim/5 to-transparent pointer-events-none z-10"></div>
             </Link>
-          </div>
+          </motion.div>
         ))}
       </div>
 
-      <div className="mt-16 text-center">
+      <motion.div
+        className="mt-16 text-center"
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-80px" }}
+      >
         <Link href="/projects" className="inline-flex items-center gap-2 text-accent hover:text-white transition-colors border-b border-accent pb-1">
           View All Projects
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M5 12h14m-7-7 7 7-7 7"/>
           </svg>
         </Link>
-      </div>
+      </motion.div>
     </section>
   );
 };
