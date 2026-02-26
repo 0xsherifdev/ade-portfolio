@@ -433,27 +433,37 @@ async function main() {
     // Note: process in hardcoded data is string[], but the Repeater stores [{step:"…"}]
     const processRepeater = p.process?.map((step) => ({ step })) ?? null
 
-    const created: any = await api('POST', '/items/projects?fields=id,slug', {
-      title:               p.title,
-      slug:                p.slug,
-      subtitle:            p.subtitle            ?? null,
-      description:         p.description,
-      link_code:           p.links.code          ?? null,
-      link_demo:           p.links.demo          ?? null,
-      image:               null, // file UUID — upload images via Directus admin UI
-      icon:                p.icon                ?? null,
-      featured:            p.featured,
-      client:              p.client              ?? null,
-      location:            p.location            ?? null,
-      service_type:        p.serviceType         ?? null,
-      overview:            p.overview            ?? null,
-      process:             processRepeater,
-      results:             p.results             ?? null,
-      testimonial_content: p.testimonial?.content ?? null,
-      testimonial_author:  p.testimonial?.author  ?? null,
-      testimonial_role:    p.testimonial?.role     ?? null,
-      final_thoughts:      p.finalThoughts        ?? null,
-    })
+    let created: any
+    try {
+      created = await api('POST', '/items/projects?fields=id,slug', {
+        title:               p.title,
+        slug:                p.slug,
+        subtitle:            p.subtitle            ?? null,
+        description:         p.description,
+        link_code:           p.links.code          ?? null,
+        link_demo:           p.links.demo          ?? null,
+        image:               null, // file UUID — upload images via Directus admin UI
+        icon:                p.icon                ?? null,
+        featured:            p.featured,
+        client:              p.client              ?? null,
+        location:            p.location            ?? null,
+        service_type:        p.serviceType         ?? null,
+        overview:            p.overview            ?? null,
+        process:             processRepeater,
+        results:             p.results             ?? null,
+        testimonial_content: p.testimonial?.content ?? null,
+        testimonial_author:  p.testimonial?.author  ?? null,
+        testimonial_role:    p.testimonial?.role     ?? null,
+        final_thoughts:      p.finalThoughts        ?? null,
+      })
+    } catch (e: any) {
+      const msg = (e.message ?? '').toLowerCase()
+      if (SKIP.some((s) => msg.includes(s.toLowerCase()))) {
+        log.skip(`project: ${p.slug} (already in DB)`)
+        continue
+      }
+      throw e
+    }
 
     for (const techName of p.tech) {
       const techId = techSlugMap[techName]
