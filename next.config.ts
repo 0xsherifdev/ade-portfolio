@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
-import { withPayload } from "@payloadcms/next/withPayload";
+
+const directusHostname = process.env.DIRECTUS_URL
+  ? new URL(process.env.DIRECTUS_URL).hostname
+  : null;
 
 const nextConfig: NextConfig = {
   images: {
@@ -8,8 +11,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'picsum.photos',
       },
+      ...(directusHostname
+        ? [{ hostname: directusHostname } as const]
+        : []),
     ],
   },
 };
 
-export default withPayload(nextConfig);
+export default nextConfig;

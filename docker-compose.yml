@@ -1,45 +1,15 @@
 services:
-  mongo:
-    image: mongo:7
-    container_name: ade-portfolio-mongo
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_DATABASE: ade-portfolio
-    volumes:
-      - mongo_data:/data/db
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        # NEXT_PUBLIC_SITE_URL is baked into the client bundle at build time —
-        # set this to your actual production domain before building.
-        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
-    container_name: ade-portfolio
-    restart: unless-stopped
-    depends_on:
-      - mongo
+  directus:
+    image: directus/directus:latest
     ports:
-      - "${PORT:-3000}:3000"
-    environment:
-      NODE_ENV: production
-      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
-      DATABASE_URI: ${DATABASE_URI:-mongodb://mongo:27017/ade-portfolio}
-      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
-      PORT: ${PORT:-3000}
+      - "8055:8055"
     volumes:
-      # Persist uploaded media files
-      - payload_media:/app/public/media
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 90s
-
-volumes:
-  mongo_data:
-    driver: local
-  payload_media:
-    driver: local
+      - ./directus/database:/directus/database
+      - ./directus/uploads:/directus/uploads
+    environment:
+      SECRET: "${DIRECTUS_SECRET:-replace-with-random-secret}"
+      DB_CLIENT: "sqlite3"
+      DB_FILENAME: "/directus/database/data.db"
+      ADMIN_EMAIL: "${DIRECTUS_ADMIN_EMAIL:-admin@example.com}"
+      ADMIN_PASSWORD: "${DIRECTUS_ADMIN_PASSWORD:-change-me}"
+      PUBLIC_URL: "${DIRECTUS_PUBLIC_URL:-http://localhost:8055}"

@@ -4,19 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node --import tsx/esm node_modules/payload/dist/bin/index.js generate:importmap && next build",
+    "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "directus:setup": "npx tsx scripts/directus-setup.ts"
   },
   "dependencies": {
-    "@payloadcms/db-mongodb": "^3.77.0",
-    "@payloadcms/live-preview-react": "^3.77.0",
-    "@payloadcms/next": "^3.76.1",
-    "@payloadcms/richtext-lexical": "^3.76.1",
-    "@payloadcms/storage-vercel-blob": "^3.77.0",
+    "@directus/sdk": "^17.0.2",
     "framer-motion": "^12.34.3",
     "next": "15.4.11",
-    "payload": "^3.76.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "sharp": "^0.34.5"

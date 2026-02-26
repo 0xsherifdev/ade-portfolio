@@ -1,13 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { RichText } from '@payloadcms/richtext-lexical/react';
 import { motion, type Variants } from 'framer-motion';
 
 interface HeroProps {
   data?: {
     topText?: string | null;
-    headline?: any;
+    /** Plain text or HTML string for the headline */
+    headline?: string | null;
     subheadline?: string | null;
     buttons?: Array<{
       label?: string | null;
@@ -48,9 +48,11 @@ const Hero = ({ data }: HeroProps) => {
           {topText}
         </motion.div>
         {data?.headline ? (
-          <motion.div variants={item} className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.1] mb-6 tracking-tighter [&_em]:text-accent [&_em]:relative [&_em]:not-italic">
-            <RichText data={data.headline} />
-          </motion.div>
+          <motion.div
+            variants={item}
+            className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.1] mb-6 tracking-tighter [&_em]:text-accent [&_em]:relative [&_em]:not-italic"
+            dangerouslySetInnerHTML={{ __html: data.headline }}
+          />
         ) : (
           <motion.h1 variants={item} className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.1] mb-6 tracking-tighter">
             Building the <span className="text-accent relative">decentralized</span> future

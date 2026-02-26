@@ -1,12 +1,12 @@
 'use client';
 
-import { RichText } from '@payloadcms/richtext-lexical/react';
 import { motion, type Variants } from 'framer-motion';
 
 interface AboutProps {
   data?: {
     title?: string | null;
-    content?: any;
+    /** Rich text stored as HTML */
+    content?: string | null;
     stats?: Array<{
       number?: string | null;
       label?: string | null;
@@ -63,7 +63,7 @@ const About = ({ data }: AboutProps) => {
           transition={{ delay: 0.1 }}
         >
           {data?.content ? (
-            <RichText data={data.content} />
+            <div dangerouslySetInnerHTML={{ __html: data.content }} />
           ) : (
             <>
               <p>
