@@ -104,19 +104,6 @@ async function fetchProject(slug: string): Promise<ProjectView | null> {
   }
 }
 
-async function fetchAllSlugs(): Promise<string[]> {
-  if (directus) {
-    try {
-      const data = await directus.request(
-        readItems('projects', { fields: ['slug'] })
-      )
-      return (data as Pick<DirectusProject, 'slug'>[]).map((p) => p.slug)
-    } catch {
-      // fall through
-    }
-  }
-  return hardcodedProjects.map((p) => p.slug)
-}
 
 async function fetchRelated(currentId: string): Promise<ProjectView[]> {
   if (directus) {
@@ -163,10 +150,7 @@ async function fetchRelated(currentId: string): Promise<ProjectView[]> {
     }))
 }
 
-export async function generateStaticParams() {
-  const slugs = await fetchAllSlugs()
-  return slugs.map((slug) => ({ slug }))
-}
+export const dynamic = 'force-dynamic'
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
