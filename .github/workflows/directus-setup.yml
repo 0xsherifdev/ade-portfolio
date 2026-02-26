@@ -1,5 +1,13 @@
 name: Directus CMS Setup
 
+# Required repository secrets:
+#   DIRECTUS_TOKEN           — preferred: static admin token (Settings → Access Tokens)
+#   DIRECTUS_ADMIN_EMAIL     — fallback email  (if no token)
+#   DIRECTUS_ADMIN_PASSWORD  — fallback password (if no token)
+#
+# Sensitive values MUST be stored as repository secrets (Settings → Secrets → Actions),
+# never as plain workflow inputs — inputs are visible in logs even when not printed.
+
 on:
   workflow_dispatch:
     inputs:
@@ -7,36 +15,18 @@ on:
         description: "Directus instance URL (e.g. https://cms.yourdomain.com)"
         required: true
         type: string
-      directus_token:
-        description: "Static admin token (preferred). Leave empty to use email + password."
-        required: false
-        type: string
-        default: ""
-      directus_admin_email:
-        description: "Admin email — used when no token is provided"
-        required: false
-        type: string
-        default: "admin@example.com"
-      directus_admin_password:
-        description: "Admin password — used when no token is provided"
-        required: false
-        type: string
-        default: ""
 
-  # Also callable from other workflows (e.g. after a deploy pipeline)
   workflow_call:
     inputs:
       directus_url:
         required: true
         type: string
-      directus_admin_email:
-        required: false
-        type: string
-        default: "admin@example.com"
     secrets:
-      directus_token:
+      DIRECTUS_TOKEN:
         required: false
-      directus_admin_password:
+      DIRECTUS_ADMIN_EMAIL:
+        required: false
+      DIRECTUS_ADMIN_PASSWORD:
         required: false
 
 jobs:
@@ -57,6 +47,15 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Mask sensitive values
+        # Belt-and-suspenders: explicitly mask secrets so they never appear in any log line
+        env:
+          TOKEN: ${{ secrets.DIRECTUS_TOKEN }}
+          PASSWORD: ${{ secrets.DIRECTUS_ADMIN_PASSWORD }}
+        run: |
+          if [ -n "$TOKEN" ];    then echo "::add-mask::$TOKEN";    fi
+          if [ -n "$PASSWORD" ]; then echo "::add-mask::$PASSWORD"; fi
 
       - name: Wait for Directus to be reachable
         env:
@@ -79,9 +78,8 @@ jobs:
 
       - name: Run setup script
         env:
-          # workflow_dispatch passes inputs directly; workflow_call passes secrets separately
           DIRECTUS_URL: ${{ inputs.directus_url }}
-          DIRECTUS_TOKEN: ${{ inputs.directus_token || secrets.directus_token }}
-          DIRECTUS_ADMIN_EMAIL: ${{ inputs.directus_admin_email }}
-          DIRECTUS_ADMIN_PASSWORD: ${{ inputs.directus_admin_password || secrets.directus_admin_password }}
+          DIRECTUS_TOKEN: ${{ secrets.DIRECTUS_TOKEN }}
+          DIRECTUS_ADMIN_EMAIL: ${{ secrets.DIRECTUS_ADMIN_EMAIL }}
+          DIRECTUS_ADMIN_PASSWORD: ${{ secrets.DIRECTUS_ADMIN_PASSWORD }}
         run: npm run directus:setup
