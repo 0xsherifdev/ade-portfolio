@@ -189,7 +189,9 @@ async function main() {
   await createField('projects', 'description',         'text',    { interface: 'textarea', required: true })
   await createField('projects', 'featured',            'boolean', { interface: 'toggle', default_value: false })
   await createField('projects', 'icon',                'string',  { interface: 'input', note: 'Emoji, e.g. 🎮' })
-  await createField('projects', 'image',               'uuid',    { interface: 'file-image' })
+  await createField('projects', 'image',               'uuid',    { interface: 'file-image', special: ['file'] })
+  // Relation required for inline upload in the admin UI
+  await createRelation({ collection: 'projects', field: 'image', related_collection: 'directus_files' })
   await createField('projects', 'client',              'string',  { interface: 'input' })
   await createField('projects', 'location',            'string',  { interface: 'input' })
   await createField('projects', 'service_type',        'string',  { interface: 'input' })

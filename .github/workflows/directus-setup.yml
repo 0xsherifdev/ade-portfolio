@@ -1,0 +1,87 @@
+name: Directus CMS Setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      directus_url:
+        description: "Directus instance URL (e.g. https://cms.yourdomain.com)"
+        required: true
+        type: string
+      directus_token:
+        description: "Static admin token (preferred). Leave empty to use email + password."
+        required: false
+        type: string
+        default: ""
+      directus_admin_email:
+        description: "Admin email — used when no token is provided"
+        required: false
+        type: string
+        default: "admin@example.com"
+      directus_admin_password:
+        description: "Admin password — used when no token is provided"
+        required: false
+        type: string
+        default: ""
+
+  # Also callable from other workflows (e.g. after a deploy pipeline)
+  workflow_call:
+    inputs:
+      directus_url:
+        required: true
+        type: string
+      directus_admin_email:
+        required: false
+        type: string
+        default: "admin@example.com"
+    secrets:
+      directus_token:
+        required: false
+      directus_admin_password:
+        required: false
+
+jobs:
+  setup:
+    name: Setup Directus collections & seed data
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Wait for Directus to be reachable
+        env:
+          DIRECTUS_URL: ${{ inputs.directus_url }}
+        run: |
+          echo "Waiting for Directus at $DIRECTUS_URL …"
+          for i in $(seq 1 12); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DIRECTUS_URL/server/health" || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✓ Directus is up (attempt $i)"
+              break
+            fi
+            echo "  attempt $i: status=$STATUS — retrying in 10s"
+            sleep 10
+          done
+          if [ "$STATUS" != "200" ]; then
+            echo "✗ Directus did not become healthy in time"
+            exit 1
+          fi
+
+      - name: Run setup script
+        env:
+          # workflow_dispatch passes inputs directly; workflow_call passes secrets separately
+          DIRECTUS_URL: ${{ inputs.directus_url }}
+          DIRECTUS_TOKEN: ${{ inputs.directus_token || secrets.directus_token }}
+          DIRECTUS_ADMIN_EMAIL: ${{ inputs.directus_admin_email }}
+          DIRECTUS_ADMIN_PASSWORD: ${{ inputs.directus_admin_password || secrets.directus_admin_password }}
+        run: npm run directus:setup

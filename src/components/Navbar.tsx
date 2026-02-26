@@ -4,7 +4,18 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-const Navbar = () => {
+interface NavbarProps {
+  logoText?: string
+  navItems?: { label: string; href: string }[]
+}
+
+const Navbar = ({ logoText = 'ade.dev', navItems }: NavbarProps) => {
+  const links = navItems?.length ? navItems : [
+    { label: 'about',    href: '#about'    },
+    { label: 'skills',   href: '#skills'   },
+    { label: 'projects', href: '#projects' },
+    { label: 'contact',  href: '#contact'  },
+  ]
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -34,14 +45,14 @@ const Navbar = () => {
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <Link href="/" className="font-mono text-xl font-semibold text-accent tracking-tighter hover:text-white transition-colors">
-        ade.dev
+        {logoText}
       </Link>
 
       <ul className="hidden md:flex gap-10 list-none">
-        {['about', 'skills', 'projects', 'contact'].map((item) => (
-          <li key={item}>
-            <Link href={`#${item}`} className="font-mono text-sm text-text-secondary hover:text-accent transition-colors relative group">
-              {item}
+        {links.map((item) => (
+          <li key={item.href}>
+            <Link href={item.href} className="font-mono text-sm text-text-secondary hover:text-accent transition-colors relative group">
+              {item.label}
               <span className="absolute -bottom-1 left-0 w-0 h-px bg-accent transition-all duration-300 group-hover:w-full"></span>
             </Link>
           </li>
@@ -63,14 +74,14 @@ const Navbar = () => {
       </button>
 
       <div className={`fixed inset-0 bg-bg-primary flex flex-col justify-center items-center gap-8 z-[99] transition-all duration-300 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-        {['about', 'skills', 'projects', 'contact'].map((item) => (
+        {links.map((item) => (
           <Link
-            key={item}
-            href={`#${item}`}
+            key={item.href}
+            href={item.href}
             onClick={closeMenu}
             className="font-mono text-2xl text-text-secondary hover:text-accent transition-colors"
           >
-            {item}
+            {item.label}
           </Link>
         ))}
       </div>
