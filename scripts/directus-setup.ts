@@ -440,7 +440,7 @@ async function main() {
       description:         p.description,
       link_code:           p.links.code          ?? null,
       link_demo:           p.links.demo          ?? null,
-      image:               p.image,
+      image:               null, // file UUID — upload images via Directus admin UI
       icon:                p.icon                ?? null,
       featured:            p.featured,
       client:              p.client              ?? null,
